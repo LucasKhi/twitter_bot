@@ -20,10 +20,10 @@ defmodule TwitterBot.MixProject do
 
   defp deps do
     [
-      {:oauth, "~> 0.5"},
-      {:oauther, "~> 1.1"},
+      {:oauth, "~> 2.1"},
       {:jason, "~> 1.1"},
-      {:extwitter, "~> 0.12"},
+      {:twitter, "~> 0.1.0"},
+      {:oauther, "~> 1.3"},
       {:poison, "~> 4.0"},
       {:httpoison, "~> 1.8"},
       {:timex, "~> 3.7"}

@@ -1,14 +1,14 @@
-defmodule TTBOT do
+defmodule TwitterBot do
   @moduledoc false
 
   use Application
 
   def start(_type, _args) do
     children = [
-      TTBOT.Workers.TwitterWorker
+      TwitterBot.Workers.TwitterWorker
     ]
 
-    opts = [name: TTBOT.Supervisor]
+    opts = [name: TwitterBot.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

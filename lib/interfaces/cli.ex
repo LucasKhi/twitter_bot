@@ -1,7 +1,15 @@
 defmodule TwitterBot.Interfaces.CLI do
+  @moduledoc false
+
   use GenServer
 
-  # ...
+  def start_link(args \\ []) do
+    GenServer.start_link(__MODULE__, args, [])
+  end
+
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
 
   ## Método para enviar um tweet
   def send_tweet(text) do

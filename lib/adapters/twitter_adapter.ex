@@ -1,63 +1,29 @@
-defmodule TwitterBot.Adapters.TwitterAdapter do
-  use ExTwitter
+defmodule TTBOT.Adapters.TwitterAdapter do
+  use GenServer
 
-  ## Envia um tweet com o texto fornecido
-  def send_tweet(tweet_text) do
-    ExTwitter.Status.update(tweet_text)
+  alias TTBOT.Domain.Tweet
+
+  def start_link() do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  ## Busca por tweets com base na consulta fornecida e no número de resultados a serem retornados
-  def search_tweets(query, count \\ 10) do
-    ExTwitter.Search.search(query, count: count)
+  def handle_call({:post_tweet, tweet_text}, _from, _state) do
+    case post_tweet(tweet_text) do
+      {:ok, tweet} ->
+        {:reply, {:ok, tweet}, _state}
+      {:error, message} ->
+        {:reply, {:error, message}, _state}
+    end
   end
 
-  ## Busca por tweets com base na consulta fornecida e retorna apenas os tweets que foram publicados desde a data fornecida
-  def search_tweets_since(query, since_id) do
-    ExTwitter.Search.search(query, since_id: since_id)
-  end
-
-  ## Retorna o perfil do usuário com o nome de usuário fornecido
-  def get_user(username) do
-    ExTwitter.Users.show(username)
-  end
-
-  ## Retorna o perfil do usuário com o ID fornecido
-  def get_user_by_id(user_id) do
-    ExTwitter.Users.show(user_id)
-  end
-
-  ## Segue o perfil do usuário com o nome de usuário fornecido
-  def follow_user(username) do
-    ExTwitter.Friendships.create(username)
-  end
-
-  ## Deixa de seguir o perfil do usuário com o nome de usuário fornecido
-  def unfollow_user(username) do
-    ExTwitter.Friendships.destroy(username)
-  end
-
-  ## Retorna uma lista de perfis de usuário que seguem o perfil do usuário com o nome de usuário fornecido
-  def get_followers(username) do
-    ExTwitter.Friendships.followers(username)
-  end
-
-  ## Retorna uma lista de perfis de usuário que o perfil do usuário com o nome de usuário fornecido segue
-  def get_friends(username) do
-    ExTwitter.Friendships.friends(username)
-  end
-
-  ## Retorna uma lista de tweets que mencionam o perfil do usuário com o nome de usuário fornecido
-  def get_mentions(username) do
-    ExTwitter.Search.search("@#{username}")
-  end
-
-  ## Retorna uma lista de tweets que foram enviados pelo perfil do usuário com o nome de usuário fornecido
-  def get_tweets_by_user(username) do
-    ExTwitter.Statuses.user_timeline(username)
-  end
-
-  ## Retorna uma lista de tweets que foram enviados pelo perfil do usuário com o ID fornecido
-  def get_tweets_by_user_id(user_id) do
-    ExTwitter.Statuses.user_timeline(user_id)
+  defp post_tweet(tweet_text) do
+    client = Twitter.client([])
+    with {:ok, tweet} <- Twitter.tweet(client, tweet_text) do
+      Tweet.new(tweet.id_str, tweet.user.screen_name, tweet.text)
+      {:ok, tweet}
+    else
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

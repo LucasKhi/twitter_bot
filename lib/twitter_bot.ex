@@ -1,18 +1,16 @@
-defmodule TwitterBot do
-  @moduledoc """
-  Documentation for `TwitterBot`.
-  """
+defmodule TwitterBot.Application do
+  @moduledoc false
 
-  @doc """
-  Hello world.
+  use Application
 
-  ## Examples
+  def start(_type, _args) do
+    children = []
 
-      iex> TwitterBot.hello()
-      :world
+    opts = [
+      name: TwitterBot.Supervisor,
+      strategy: :one_for_one
+    ]
 
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, opts)
   end
 end
